@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/pubkey-getter/static/css/main.670854ce.css",
+    "main.js": "/pubkey-getter/static/js/main.bae214ee.js",
+    "index.html": "/pubkey-getter/index.html",
+    "main.670854ce.css.map": "/pubkey-getter/static/css/main.670854ce.css.map",
+    "main.bae214ee.js.map": "/pubkey-getter/static/js/main.bae214ee.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.670854ce.css",
+    "static/js/main.bae214ee.js"
+  ]
+}
