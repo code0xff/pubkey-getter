@@ -33,15 +33,17 @@ function App() {
 
   return (
     <div className="App">
-      <h1>GET PUBLIC KEY AND UNIVERSAL ADDRESS</h1>
-      <br />
-      <button
-        className='button-default'
-        onClick={getPublicKey}
-        disabled={account && !universalAddress}
-      >
-        {!account && !universalAddress ? 'CONNECT' : (account && !universalAddress ? 'SIGNING...' : 'RECONNECT')}
-      </button>
+      <div className='app-title'>
+        <h1>GET PUBLIC KEY AND UNIVERSAL ADDRESS</h1>
+        <br />
+        <button
+          className='button-default'
+          onClick={getPublicKey}
+          disabled={account && !universalAddress}
+        >
+          {!account && !universalAddress ? 'CONNECT' : (account && !universalAddress ? 'SIGNING...' : 'RECONNECT')}
+        </button>
+      </div>
       <br /><br />
       <div className='app-content'>
         {
