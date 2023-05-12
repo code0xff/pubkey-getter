@@ -25,7 +25,7 @@ function App() {
     setPublicKey(publicKey);
     const compressed = SigningKey.computePublicKey(publicKey, true);
     setCompressedPublicKey(compressed);
-    const base64 = btoa('e701' + (compressed.startsWith('0x') ? compressed.slice(2) : compressed).match(/\w{2}/g).map((a) => { return String.fromCharCode(parseInt(a, 16)); }).join(""));
+    const base64 = btoa((compressed.startsWith('0x') ? 'e701' + compressed.slice(2) : 'e701' + compressed).match(/\w{2}/g).map((a) => { return String.fromCharCode(parseInt(a, 16)); }).join(""));
     const base64Url = base64.replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
     const universalAddress = 'u' + base64Url;
     setUniversalAddress(universalAddress);
