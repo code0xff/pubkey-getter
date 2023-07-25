@@ -1,17 +1,23 @@
 import React from 'react';
-import { ethers, SigningKey } from 'ethers';
+import { ethers, SigningKey, sha256, ripemd160 } from 'ethers';
+import { bech32 } from "bech32";
 import './App.css';
+
+const fromHex = (hexString) =>
+  Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
 
 function App() {
   const [account, setAccount] = React.useState();
   const [publicKey, setPublicKey] = React.useState();
   const [compressedPublicKey, setCompressedPublicKey] = React.useState();
+  const [cosmosAddress, setCosmosAddress] = React.useState();
   const [universalAddress, setUniversalAddress] = React.useState();
 
   const getPublicKey = async () => {
     setAccount(null);
     setPublicKey(null);
     setCompressedPublicKey(null);
+    setCosmosAddress(null);
     setUniversalAddress(null);
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -25,6 +31,12 @@ function App() {
     setPublicKey(publicKey);
     const compressed = SigningKey.computePublicKey(publicKey, true);
     setCompressedPublicKey(compressed);
+    let rawAddress = ripemd160(sha256(compressed));
+    if (rawAddress.startsWith("0x")) {
+      rawAddress = rawAddress.substring(2);
+    }
+    const cosmosAddress = bech32.encode("cosmos", bech32.toWords(fromHex(rawAddress)));
+    setCosmosAddress(cosmosAddress);
     const base64 = btoa((compressed.startsWith('0x') ? 'e701' + compressed.slice(2) : 'e701' + compressed).match(/\w{2}/g).map((a) => { return String.fromCharCode(parseInt(a, 16)); }).join(""));
     const base64Url = base64.replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
     const universalAddress = 'u' + base64Url;
@@ -67,6 +79,13 @@ function App() {
                     <tr>
                       <th className='th-default'>COMPRESSED PUBLIC KEY</th>
                       <td className='td-default'><pre>{compressedPublicKey}</pre></td>
+                    </tr> : null
+                }
+                {
+                  cosmosAddress ?
+                    <tr>
+                      <th className='th-default'>COSMOS ADDRESS</th>
+                      <td className='td-default'><pre>{cosmosAddress}</pre></td>
                     </tr> : null
                 }
                 {
