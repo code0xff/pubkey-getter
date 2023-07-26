@@ -4,8 +4,8 @@ import { bech32 } from "bech32";
 import "./App.css";
 import { ec } from "elliptic";
 
-const keplrLogo = "https://file.notion.so/f/s/237c011b-62e8-4a9b-bb18-1b5c37ad52c3/keplr_icon.png?id=7d37c09a-0b7d-439b-98a1-0abfc19fddc8&table=block&spaceId=612a5b92-f057-404a-86c0-b3b04722b300&expirationTimestamp=1690502400000&signature=cHD8vtJCrANT8ulnXJ_rTFaOjuEKccPmONSieyd4shM&downloadName=keplr_icon.png";
-const metamaskLogo = "https://file.notion.so/f/s/b4773be1-21e8-45cc-aa95-0a765621933d/metamask_logo.png?id=a8f18887-58b5-42f1-9a36-6fc840df86bb&table=block&spaceId=612a5b92-f057-404a-86c0-b3b04722b300&expirationTimestamp=1690430400000&signature=ez5gRCTgs7jpDK-AxGGr1WK9QIJxcfxu2tGsLCKuGbc&downloadName=metamask_logo.png";
+const keplrLogo = `${process.env.PUBLIC_URL}/keplr_logo.png`;
+const metamaskLogo = `${process.env.PUBLIC_URL}/metamask_logo.png`;
 
 function App() {
   const [publicKey, setPublicKey] = React.useState();
