@@ -46,3 +46,8 @@ pre {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.toast {
+  white-space: pre-wrap;
+  word-break: break-all;
+}

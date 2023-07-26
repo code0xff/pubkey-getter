@@ -1,7 +1,7 @@
-import React from 'react';
-import { ethers, SigningKey, sha256, ripemd160, computeAddress, hexlify } from 'ethers';
+import React from "react";
+import { ethers, SigningKey, sha256, ripemd160, computeAddress, hexlify } from "ethers";
 import { bech32 } from "bech32";
-import './App.css';
+import "./App.css";
 import { ec } from "elliptic";
 
 const keplrLogo = "https://file.notion.so/f/s/237c011b-62e8-4a9b-bb18-1b5c37ad52c3/keplr_icon.png?id=7d37c09a-0b7d-439b-98a1-0abfc19fddc8&table=block&spaceId=612a5b92-f057-404a-86c0-b3b04722b300&expirationTimestamp=1690502400000&signature=cHD8vtJCrANT8ulnXJ_rTFaOjuEKccPmONSieyd4shM&downloadName=keplr_icon.png";
@@ -18,22 +18,21 @@ function App() {
   const [isMessageOn, setIsMessageOn] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState(false);
 
-  const fromHex = (hexString) =>
-  Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+  const fromHex = (hexString) => Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
 
   const copyToClipboard = (text) => {
-    setToastMessage(`Copied! ${text}`);
+    setToastMessage(`Copied!`);
     navigator.clipboard.writeText(text);
     setIsMessageOn(true);
     setTimeout(() => {
       setIsMessageOn(false);
-    }, 2000);
+    }, 1000);
   }
 
   const getUniversalAddress = (compressed) => {
-    const base64 = btoa((compressed.startsWith('0x') ? 'e701' + compressed.slice(2) : 'e701' + compressed).match(/\w{2}/g).map((a) => { return String.fromCharCode(parseInt(a, 16)); }).join(""));
-    const base64Url = base64.replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
-    const universalAddress = 'u' + base64Url;
+    const base64 = btoa((compressed.startsWith("0x") ? "e701" + compressed.slice(2) : "e701" + compressed).match(/\w{2}/g).map((a) => { return String.fromCharCode(parseInt(a, 16)); }).join(""));
+    const base64Url = base64.replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+    const universalAddress = "u" + base64Url;
     return universalAddress;
   }
 
@@ -45,17 +44,17 @@ function App() {
     setUniversalAddress(null);
     setIsConnected(false);
 
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
     if (accounts.length > 0) {
       setEthereumAddress(accounts[0]);
       setIsSigning(true);
       try {
         const signature = await window.ethereum.request({
-          method: 'personal_sign',
-          params: ['pubkey_getter', accounts[0]],
+          method: "personal_sign",
+          params: ["pubkey_getter", accounts[0]],
         });
         
-        const msgHash = ethers.keccak256(new TextEncoder().encode(`\x19Ethereum Signed Message:\n${'personal_sign'.length}pubkey_getter`));
+        const msgHash = ethers.keccak256(new TextEncoder().encode(`\x19Ethereum Signed Message:\n${"personal_sign".length}pubkey_getter`));
         const publicKey = SigningKey.recoverPublicKey(msgHash, signature);
         setPublicKey(publicKey);
         const compressed = SigningKey.computePublicKey(publicKey, true);
@@ -108,12 +107,12 @@ function App() {
 
   return (
     <div className="App">
-      <div className='app-title'>
+      <div className="app-title">
         <h1>GET PUBLIC KEY AND DERIVE ADDRESS</h1>
         <br />
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <button
-            className='button-default'
+            className="button-default"
             onClick={connectMetamask}
           >
             <div style={{display: "flex", flexDirection: "row"}}>
@@ -123,7 +122,7 @@ function App() {
           </button>
           <br/>
           <button
-            className='button-default'
+            className="button-default"
             onClick={connectKeplr}
           >
             <div style={{display: "flex", flexDirection: "row"}}>
@@ -134,21 +133,18 @@ function App() {
         </div>
       </div>
       <br /><br />
-      <div className='app-content'>
+      <div className="app-content">
         {
           publicKey ?
-            <table className='table-default'>
+            <table className="table-default">
               <thead />
               <tbody>
                 {
                   publicKey ?
                     <tr>
-                      <th className='th-default' style={{ padding: "1.2rem 1.2rem 0.6rem"}}>UNCOMPRESSED</th>
-                      <td className='td-default' style={{ padding: "1.2rem 1.2rem 0.6rem"}}>
-                        <pre 
-                          className='clickable'  
-                          onClick={() => copyToClipboard(publicKey)}
-                        >
+                      <th className="th-default" style={{ padding: "1.2rem 1.2rem 0.6rem"}}>UNCOMPRESSED</th>
+                      <td className="td-default" style={{ padding: "1.2rem 1.2rem 0.6rem"}} onClick={() => copyToClipboard(publicKey)}>
+                        <pre className="clickable">
                           {publicKey}
                         </pre>
                       </td>
@@ -157,12 +153,9 @@ function App() {
                 {
                   compressedPublicKey ?
                     <tr>
-                      <th className='th-default' style={{ padding: "0.6rem 1.2rem"}}>COMPRESSED</th>
-                      <td className='td-default' style={{ padding: "0.6rem 1.2rem"}}>
-                        <pre 
-                          className='clickable'  
-                          onClick={() => copyToClipboard(compressedPublicKey)}
-                        >
+                      <th className="th-default" style={{ padding: "0.6rem 1.2rem"}}>COMPRESSED</th>
+                      <td className="td-default" style={{ padding: "0.6rem 1.2rem"}} onClick={() => copyToClipboard(compressedPublicKey)}>
+                        <pre className="clickable">
                           {compressedPublicKey}
                         </pre>
                       </td>
@@ -171,12 +164,9 @@ function App() {
                 {
                   ethereumAddress ?
                     <tr>
-                      <th className='th-default' style={{ padding: "0.6rem 1.2rem"}}>ETHEREUM</th>
-                      <td className='td-default' style={{ padding: "0.6rem 1.2rem"}}>
-                        <pre 
-                          className='clickable'  
-                          onClick={() => copyToClipboard(ethereumAddress)}
-                        >
+                      <th className="th-default" style={{ padding: "0.6rem 1.2rem"}}>ETHEREUM</th>
+                      <td className="td-default" style={{ padding: "0.6rem 1.2rem"}} onClick={() => copyToClipboard(ethereumAddress)}>
+                        <pre className="clickable">
                           {ethereumAddress}
                         </pre>
                       </td>
@@ -185,12 +175,9 @@ function App() {
                 {
                   cosmosAddress ?
                     <tr>
-                      <th className='th-default' style={{ padding: "0.6rem 1.2rem"}}>COSMOS</th>
-                      <td className='td-default' style={{ padding: "0.6rem 1.2rem"}}>
-                        <pre 
-                          className='clickable'  
-                          onClick={() => copyToClipboard(cosmosAddress)}
-                        >
+                      <th className="th-default" style={{ padding: "0.6rem 1.2rem"}}>COSMOS</th>
+                      <td className="td-default" style={{ padding: "0.6rem 1.2rem"}} onClick={() => copyToClipboard(cosmosAddress)}>
+                        <pre className="clickable">
                           {cosmosAddress}
                         </pre>
                       </td>
@@ -199,12 +186,9 @@ function App() {
                 {
                   universalAddress ?
                     <tr>
-                      <th className='th-default' style={{ padding: "0.6rem 1.2rem 1.2rem"}}>UNIVERSAL</th>
-                      <td className='td-default' style={{ padding: "0.6rem 1.2rem 1.2rem"}}>
-                        <pre 
-                          className='clickable'  
-                          onClick={() => copyToClipboard(universalAddress)}
-                        >
+                      <th className="th-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}}>UNIVERSAL</th>
+                      <td className="td-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}}   onClick={() => copyToClipboard(universalAddress)}>
+                        <pre className="clickable">
                           {universalAddress}
                         </pre>
                       </td>
@@ -214,9 +198,9 @@ function App() {
             </table> : null 
           }
           <br />
-          <p>{isConnected ? null : "PLEASE CLICK BUTTON AND CONNECT WALLET!"}</p>
-          <p>{isSigning ? "PLEASE APPROVE SIGNING TO DERIVE PUBLIC KEY AND ADDRESS!" : null}</p>
-          <p>{isMessageOn ? toastMessage : null}</p>
+          <p className="message">{isConnected ? null : "PLEASE CLICK BUTTON AND CONNECT WALLET!"}</p>
+          <p className="message">{isSigning ? "PLEASE APPROVE SIGNING TO DERIVE PUBLIC KEY AND ADDRESS!" : null}</p>
+          <p className="message">{isMessageOn ? toastMessage : null}</p>
       </div>
     </div>
   );
