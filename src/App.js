@@ -11,6 +11,7 @@ function App() {
   const [publicKey, setPublicKey] = React.useState();
   const [compressedPublicKey, setCompressedPublicKey] = React.useState();
   const [ethereumAddress, setEthereumAddress] = React.useState();
+  const [cosmosRawAddress, setCosmosRawAddress] = React.useState();
   const [cosmosAddress, setCosmosAddress] = React.useState();
   const [universalAddress, setUniversalAddress] = React.useState();
   const [isConnected, setIsConnected] = React.useState(false);
@@ -60,6 +61,7 @@ function App() {
         const compressed = SigningKey.computePublicKey(publicKey, true);
         setCompressedPublicKey(compressed);
         let rawAddress = ripemd160(sha256(compressed));
+        setCosmosRawAddress(rawAddress);
         if (rawAddress.startsWith("0x")) {
           rawAddress = rawAddress.substring(2);
         }
@@ -89,9 +91,11 @@ function App() {
     const accounts = await offlineSigner.getAccounts();
     if (accounts.length > 0) {
       const { address, pubkey } = accounts[0];
+      setCosmosAddress(address);
       const compressed = hexlify(pubkey);
       setCompressedPublicKey(compressed);
-      setCosmosAddress(address);
+      let rawAddress = ripemd160(sha256(compressed));
+      setCosmosRawAddress(rawAddress);
       let publicKey = ec("secp256k1").keyFromPublic(pubkey).getPublic(false, "hex");
       if (!publicKey.startsWith("0x")) {
         publicKey = `0x${publicKey}`;
@@ -168,6 +172,17 @@ function App() {
                       <td className="td-default" style={{ padding: "0.6rem 1.2rem"}} onClick={() => copyToClipboard(ethereumAddress)}>
                         <pre className="clickable">
                           {ethereumAddress}
+                        </pre>
+                      </td>
+                    </tr> : null
+                }
+                {
+                  cosmosRawAddress ?
+                    <tr>
+                      <th className="th-default" style={{ padding: "0.6rem 1.2rem"}}>COSMOS RAW</th>
+                      <td className="td-default" style={{ padding: "0.6rem 1.2rem"}} onClick={() => copyToClipboard(cosmosRawAddress)}>
+                        <pre className="clickable">
+                          {cosmosRawAddress}
                         </pre>
                       </td>
                     </tr> : null
