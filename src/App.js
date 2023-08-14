@@ -13,6 +13,7 @@ function App() {
   const [ethereumAddress, setEthereumAddress] = React.useState();
   const [cosmosRawAddress, setCosmosRawAddress] = React.useState();
   const [cosmosAddress, setCosmosAddress] = React.useState();
+  const [evmosAddress, setEvmosAddress] = React.useState();
   const [universalAddress, setUniversalAddress] = React.useState();
   const [isConnected, setIsConnected] = React.useState(false);
   const [isSigning, setIsSigning] = React.useState(false);
@@ -43,11 +44,13 @@ function App() {
     setCompressedPublicKey(null);
     setCosmosAddress(null);
     setUniversalAddress(null);
+    setEvmosAddress(null);
     setIsConnected(false);
 
     const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
     if (accounts.length > 0) {
       setEthereumAddress(accounts[0]);
+      setEvmosAddress(bech32.encode("evmos", bech32.toWords(fromHex(accounts[0].startsWith("0x") ? accounts[0].substring(2) : accounts[0]))));
       setIsSigning(true);
       try {
         const signature = await window.ethereum.request({
@@ -62,10 +65,7 @@ function App() {
         setCompressedPublicKey(compressed);
         let rawAddress = ripemd160(sha256(compressed));
         setCosmosRawAddress(rawAddress);
-        if (rawAddress.startsWith("0x")) {
-          rawAddress = rawAddress.substring(2);
-        }
-        const cosmosAddress = bech32.encode("cosmos", bech32.toWords(fromHex(rawAddress)));
+        const cosmosAddress = bech32.encode("cosmos", bech32.toWords(fromHex(rawAddress.startsWith("0x") ? rawAddress.substring(2) : rawAddress)));
         setCosmosAddress(cosmosAddress);
         const universalAddress = getUniversalAddress(compressed);
         setUniversalAddress(universalAddress);
@@ -83,6 +83,7 @@ function App() {
     setCompressedPublicKey(null);
     setCosmosAddress(null);
     setUniversalAddress(null);
+    setEvmosAddress(null);
     setIsConnected(false);
 
     const chainId = "cosmoshub-4";
@@ -103,6 +104,7 @@ function App() {
       setPublicKey(publicKey);
       const ethereumAddress = computeAddress(publicKey);
       setEthereumAddress(ethereumAddress);
+      setEvmosAddress(bech32.encode("evmos", bech32.toWords(fromHex(ethereumAddress.startsWith("0x") ? ethereumAddress.substring(2) : ethereumAddress))));
       const universalAddress = getUniversalAddress(compressed);
       setUniversalAddress(universalAddress);
       setIsConnected(true);
@@ -199,10 +201,21 @@ function App() {
                     </tr> : null
                 }
                 {
+                  evmosAddress ?
+                    <tr>
+                      <th className="th-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}}>EVMOS</th>
+                      <td className="td-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}} onClick={() => copyToClipboard(evmosAddress)}>
+                        <pre className="clickable">
+                          {evmosAddress}
+                        </pre>
+                      </td>
+                    </tr> : null
+                }
+                {
                   universalAddress ?
                     <tr>
                       <th className="th-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}}>UNIVERSAL</th>
-                      <td className="td-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}}   onClick={() => copyToClipboard(universalAddress)}>
+                      <td className="td-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}} onClick={() => copyToClipboard(universalAddress)}>
                         <pre className="clickable">
                           {universalAddress}
                         </pre>
