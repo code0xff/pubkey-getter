@@ -3,6 +3,7 @@ import { ethers, SigningKey, sha256, ripemd160, computeAddress, hexlify } from "
 import { bech32 } from "bech32";
 import "./App.css";
 import { ec } from "elliptic";
+import { blake2AsHex, encodeAddress } from "@polkadot/util-crypto";
 
 const keplrLogo = `${process.env.PUBLIC_URL}/keplr_logo.png`;
 const metamaskLogo = `${process.env.PUBLIC_URL}/metamask_logo.png`;
@@ -14,7 +15,7 @@ function App() {
   const [cosmosRawAddress, setCosmosRawAddress] = React.useState();
   const [cosmosAddress, setCosmosAddress] = React.useState();
   const [evmosAddress, setEvmosAddress] = React.useState();
-  const [universalAddress, setUniversalAddress] = React.useState();
+  const [substrateAddress, setSubstrateAddress] = React.useState();
   const [isConnected, setIsConnected] = React.useState(false);
   const [isSigning, setIsSigning] = React.useState(false);
   const [isMessageOn, setIsMessageOn] = React.useState(false);
@@ -31,11 +32,8 @@ function App() {
     }, 1000);
   }
 
-  const getUniversalAddress = (compressed) => {
-    const base64 = btoa((compressed.startsWith("0x") ? "e701" + compressed.slice(2) : "e701" + compressed).match(/\w{2}/g).map((a) => { return String.fromCharCode(parseInt(a, 16)); }).join(""));
-    const base64Url = base64.replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
-    const universalAddress = "u" + base64Url;
-    return universalAddress;
+  const getSubstrateAddress = (compressed) => {
+    return encodeAddress(blake2AsHex(compressed, 256));
   }
 
   const connectMetamask = async () => {
@@ -43,7 +41,7 @@ function App() {
     setPublicKey(null);
     setCompressedPublicKey(null);
     setCosmosAddress(null);
-    setUniversalAddress(null);
+    setSubstrateAddress(null);
     setEvmosAddress(null);
     setIsConnected(false);
 
@@ -67,8 +65,8 @@ function App() {
         setCosmosRawAddress(rawAddress);
         const cosmosAddress = bech32.encode("cosmos", bech32.toWords(fromHex(rawAddress.startsWith("0x") ? rawAddress.substring(2) : rawAddress)));
         setCosmosAddress(cosmosAddress);
-        const universalAddress = getUniversalAddress(compressed);
-        setUniversalAddress(universalAddress);
+        const substrateAddress = getSubstrateAddress(compressed);
+        setSubstrateAddress(substrateAddress);
         setIsConnected(true);
       } catch (e) {
       } finally {
@@ -82,7 +80,7 @@ function App() {
     setPublicKey(null);
     setCompressedPublicKey(null);
     setCosmosAddress(null);
-    setUniversalAddress(null);
+    setSubstrateAddress(null);
     setEvmosAddress(null);
     setIsConnected(false);
 
@@ -105,8 +103,8 @@ function App() {
       const ethereumAddress = computeAddress(publicKey);
       setEthereumAddress(ethereumAddress);
       setEvmosAddress(bech32.encode("evmos", bech32.toWords(fromHex(ethereumAddress.startsWith("0x") ? ethereumAddress.substring(2) : ethereumAddress))));
-      const universalAddress = getUniversalAddress(compressed);
-      setUniversalAddress(universalAddress);
+      const substrateAddress = getSubstrateAddress(compressed);
+      setSubstrateAddress(substrateAddress);
       setIsConnected(true);
     }
   }
@@ -212,12 +210,12 @@ function App() {
                     </tr> : null
                 }
                 {
-                  universalAddress ?
+                  substrateAddress ?
                     <tr>
-                      <th className="th-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}}>UNIVERSAL</th>
-                      <td className="td-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}} onClick={() => copyToClipboard(universalAddress)}>
+                      <th className="th-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}}>SUBSTRATE</th>
+                      <td className="td-default" style={{ padding: "0.6rem 1.2rem 1.2rem"}} onClick={() => copyToClipboard(substrateAddress)}>
                         <pre className="clickable">
-                          {universalAddress}
+                          {substrateAddress}
                         </pre>
                       </td>
                     </tr> : null
