@@ -16,6 +16,7 @@ function App() {
   const [cosmosAddress, setCosmosAddress] = React.useState();
   const [evmosAddress, setEvmosAddress] = React.useState();
   const [substrateAddress, setSubstrateAddress] = React.useState();
+  const [substrateRawAddress, setSubstrateRawAddress] = React.useState();
   const [nostrAddress, setNostrAddress] = React.useState();
   const [isConnected, setIsConnected] = React.useState(false);
   const [isSigning, setIsSigning] = React.useState(false);
@@ -35,6 +36,10 @@ function App() {
 
   const getSubstrateAddress = (compressed) => {
     return encodeAddress(blake2AsHex(compressed, 256));
+  }
+
+  const getSubstrateRawAddress = (compressed) => {
+    return blake2AsHex(compressed, 256);
   }
 
   const getNostrAddress = (compressed) => {
@@ -73,6 +78,8 @@ function App() {
         setCosmosAddress(cosmosAddress);
         const substrateAddress = getSubstrateAddress(compressed);
         setSubstrateAddress(substrateAddress);
+        const substrateRawAddress = getSubstrateRawAddress(compressed);
+        setSubstrateRawAddress(substrateRawAddress);
         const nostrAddress = getNostrAddress(compressed);
         setNostrAddress(nostrAddress);
         setIsConnected(true);
@@ -113,6 +120,8 @@ function App() {
       setEvmosAddress(bech32.encode("evmos", bech32.toWords(fromHex(ethereumAddress.startsWith("0x") ? ethereumAddress.substring(2) : ethereumAddress))));
       const substrateAddress = getSubstrateAddress(compressed);
       setSubstrateAddress(substrateAddress);
+      const substrateRawAddress = getSubstrateRawAddress(compressed);
+      setSubstrateRawAddress(substrateRawAddress);
       const nostrAddress = getNostrAddress(compressed);
       setNostrAddress(nostrAddress);
       setIsConnected(true);
@@ -226,6 +235,17 @@ function App() {
                       <td className="td-default" style={{ padding: "0.6rem 1.2rem 1.2rem" }} onClick={() => copyToClipboard(substrateAddress)}>
                         <pre className="clickable">
                           {substrateAddress}
+                        </pre>
+                      </td>
+                    </tr> : null
+                }
+                {
+                  substrateRawAddress ?
+                    <tr>
+                      <th className="th-default" style={{ padding: "0.6rem 1.2rem 1.2rem" }}>SUBSTRATE RAW</th>
+                      <td className="td-default" style={{ padding: "0.6rem 1.2rem 1.2rem" }} onClick={() => copyToClipboard(substrateRawAddress)}>
+                        <pre className="clickable">
+                          {substrateRawAddress}
                         </pre>
                       </td>
                     </tr> : null
